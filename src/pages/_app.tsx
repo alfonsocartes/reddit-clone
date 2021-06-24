@@ -4,6 +4,12 @@ import { ThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import theme from "../theme";
 
+// Amplify: because it's being imported in _app.js it will import it in every page
+// which might not be the best soluction becase it will increase the size by a lot
+import Amplify, { Auth } from "aws-amplify";
+import awsconfig from "../aws-exports";
+Amplify.configure({ ...awsconfig, ssr: true });
+
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
     // Remove the server-side injected CSS.
