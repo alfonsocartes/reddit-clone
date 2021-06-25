@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { useForm, SubmitHandler } from "react-hook-form";
+
+// AWS Amplify
+import { Auth } from "aws-amplify";
+
+// Styles
 import { Button, Grid, TextField, Snackbar } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
+
+// Context
+import { useUser } from "../context/AuthContext";
 
 interface IFormInput {
   username: string;
@@ -13,6 +21,7 @@ interface IFormInput {
 
 const Signup = () => {
   const router = useRouter();
+  const { user, setUser } = useUser();
   const [open, setOpen] = useState(false);
   const [signUpError, setSignUpError] = useState<string>("");
   const [showCode, setShowCode] = useState<boolean>(false);
@@ -24,8 +33,6 @@ const Signup = () => {
   } = useForm<IFormInput>();
 
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
-    console.log("Submited the form");
-    console.log(data);
     try {
       signUpWithEmailAndPassword(data);
     } catch (error) {
@@ -42,8 +49,6 @@ const Signup = () => {
     setOpen(false);
   };
 
-  console.log("Errors", errors);
-
   async function signUpWithEmailAndPassword(data: IFormInput) {
     const { username, password, email } = data;
     try {
@@ -54,13 +59,13 @@ const Signup = () => {
           email,
         },
       });
-      console.log(user);
+      console.log("Signed up user", user);
     } catch (error) {
-      console.log("error signing up:", error);
-      setSignUpError(error.message);
-      setOpen(true);
+      throw error;
     }
   }
+
+  console.log("The value from the user from the hook is:", user);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
