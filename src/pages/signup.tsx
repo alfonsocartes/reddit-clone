@@ -4,6 +4,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 
 // AWS Amplify
 import { Auth } from "aws-amplify";
+import { CognitoUser } from "@aws-amplify/auth";
 
 // Styles
 import { Button, Grid, TextField, Snackbar } from "@material-ui/core";
@@ -32,9 +33,45 @@ const Signup = () => {
     handleSubmit,
   } = useForm<IFormInput>();
 
-  const onSubmit: SubmitHandler<IFormInput> = (data) => {
+  async function signUpWithEmailAndPassword(
+    data: IFormInput
+  ): Promise<CognitoUser> {
+    const { username, password, email } = data;
     try {
-      signUpWithEmailAndPassword(data);
+      const { user } = await Auth.signUp({
+        username,
+        password,
+        attributes: {
+          email,
+        },
+      });
+      console.log("Signed up user", user);
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async function confirmSignUp(data: IFormInput) {
+    const { username, password, code } = data;
+
+    try {
+      await Auth.confirmSignUp(username, code);
+      const amplifyUser = await Auth.signIn(username, password);
+      console.log("Success, signed in a user", amplifyUser);
+    } catch (error) {
+      console.log("Error confirming sign up", error);
+    }
+  }
+
+  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    try {
+      if (showCode) {
+        confirmSignUp(data);
+      } else {
+        await signUpWithEmailAndPassword(data);
+        setShowCode(true);
+      }
     } catch (error) {
       console.error(error);
       setSignUpError(error.message);
@@ -48,22 +85,6 @@ const Signup = () => {
     }
     setOpen(false);
   };
-
-  async function signUpWithEmailAndPassword(data: IFormInput) {
-    const { username, password, email } = data;
-    try {
-      const { user } = await Auth.signUp({
-        username,
-        password,
-        attributes: {
-          email,
-        },
-      });
-      console.log("Signed up user", user);
-    } catch (error) {
-      throw error;
-    }
-  }
 
   console.log("The value from the user from the hook is:", user);
 
@@ -128,9 +149,37 @@ const Signup = () => {
             />
           </Grid>
         </Grid>
+
+        {showCode && (
+          <Grid item>
+            <TextField
+              variant="outlined"
+              id="code"
+              label="Verification Code"
+              type="text"
+              error={errors.code ? true : false}
+              helperText={errors.code ? errors.code.message : null}
+              {...register("code", {
+                required: {
+                  value: true,
+                  message: "Please enter the verification code.",
+                },
+                minLength: {
+                  value: 6,
+                  message: "Please enter the correct verification code.",
+                },
+                maxLength: {
+                  value: 6,
+                  message: "Please enter the correct verification code.",
+                },
+              })}
+            />
+          </Grid>
+        )}
+
         <Grid style={{ marginTop: 16 }}>
           <Button variant="contained" type="submit">
-            Sign Up
+            {showCode ? "Confirm Code" : "Sign Up"}
           </Button>
         </Grid>
       </Grid>
