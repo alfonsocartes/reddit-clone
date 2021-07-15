@@ -59,6 +59,11 @@ const Signup = () => {
       await Auth.confirmSignUp(username, code);
       const amplifyUser = await Auth.signIn(username, password);
       console.log("Success, signed in a user", amplifyUser);
+      if (amplifyUser) {
+        router.push("/");
+      } else {
+        throw new Error("Error, something whent wrong");
+      }
     } catch (error) {
       console.log("Error confirming sign up", error);
     }
