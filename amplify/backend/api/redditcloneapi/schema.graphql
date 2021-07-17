@@ -12,6 +12,10 @@ type Post
   ) {
   id: ID!
   title: String!
+  contents: String!
+  image: String
+  upvotes: Int!
+  downvotes: Int!
   comments: [Comment] @connection(keyName: "byPost", fields: ["id"])
 }
 

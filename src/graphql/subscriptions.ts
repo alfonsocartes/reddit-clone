@@ -7,6 +7,10 @@ export const onCreatePost = /* GraphQL */ `
     onCreatePost {
       id
       title
+      contents
+      image
+      upvotes
+      downvotes
       createdAt
       updatedAt
       owner
@@ -29,6 +33,10 @@ export const onUpdatePost = /* GraphQL */ `
     onUpdatePost {
       id
       title
+      contents
+      image
+      upvotes
+      downvotes
       createdAt
       updatedAt
       owner
@@ -51,6 +59,10 @@ export const onDeletePost = /* GraphQL */ `
     onDeletePost {
       id
       title
+      contents
+      image
+      upvotes
+      downvotes
       createdAt
       updatedAt
       owner
@@ -79,6 +91,10 @@ export const onCreateComment = /* GraphQL */ `
       post {
         id
         title
+        contents
+        image
+        upvotes
+        downvotes
         createdAt
         updatedAt
         owner
@@ -101,6 +117,10 @@ export const onUpdateComment = /* GraphQL */ `
       post {
         id
         title
+        contents
+        image
+        upvotes
+        downvotes
         createdAt
         updatedAt
         owner
@@ -123,6 +143,10 @@ export const onDeleteComment = /* GraphQL */ `
       post {
         id
         title
+        contents
+        image
+        upvotes
+        downvotes
         createdAt
         updatedAt
         owner
