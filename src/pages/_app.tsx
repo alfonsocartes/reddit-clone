@@ -11,7 +11,7 @@ import AuthContext from "../context/AuthContext";
 
 // Amplify: because it's being imported in _app.js it will import it in every page
 // which might not be the best soluction becase it will increase the size by a lot
-import Amplify, { Auth } from "aws-amplify";
+import Amplify from "aws-amplify";
 import awsconfig from "../aws-exports";
 
 Amplify.configure({ ...awsconfig, ssr: true });

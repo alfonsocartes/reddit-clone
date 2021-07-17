@@ -1,20 +1,30 @@
 import React, { FC } from "react";
 import Image from "next/image";
-import { Grid, IconButton, Paper, Typography } from "@material-ui/core";
+import { useRouter } from "next/router";
+import {
+  ButtonBase,
+  Grid,
+  IconButton,
+  Paper,
+  Typography,
+} from "@material-ui/core";
 import { ArrowDownward, ArrowUpward } from "@material-ui/icons";
 import { Post } from "../API";
 
 interface Props {
   post: Post;
 }
-function formatDatePosted(date: string): string {
-  const now = new Date(Date.now());
-  const current = new Date(date);
-  const diff = now.getTime() - current.getTime();
-  return (diff / 1000 / 60 / 60).toFixed(0);
-}
 
 const PostPreview: FC<Props> = ({ post }) => {
+  function formatDatePosted(date: string): string {
+    const now = new Date(Date.now());
+    const current = new Date(date);
+    const diff = now.getTime() - current.getTime();
+    return (diff / 1000 / 60 / 60).toFixed(0);
+  }
+
+  const router = useRouter();
+
   return (
     <Paper elevation={3}>
       <Grid
@@ -56,33 +66,35 @@ const PostPreview: FC<Props> = ({ post }) => {
           </Grid>
         </Grid>
 
-        <Grid item>
-          <Grid container direction="column" alignItems="flex-start">
-            <Grid item>
-              <Typography variant="body1">
-                Posted by <b>{post.owner}</b> {formatDatePosted(post.createdAt)}{" "}
-                hours ago
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography variant="h2">{post.title}</Typography>
-            </Grid>
-            <Grid item style={{ maxHeight: 32, overflowY: "hidden" }}>
-              <Typography variant="body1">{post.contents}</Typography>
-            </Grid>
-            {!post.image && (
+        <ButtonBase onClick={() => router.push(`/post/${post.id}`)}>
+          <Grid item>
+            <Grid container direction="column" alignItems="flex-start">
               <Grid item>
-                <Image
-                  src={"https://source.unsplash.com/random/980x540"}
-                  alt={post.title + " image"}
-                  width={980}
-                  height={540}
-                  layout="intrinsic"
-                />
+                <Typography variant="body1">
+                  Posted by <b>{post.owner}</b>{" "}
+                  {formatDatePosted(post.createdAt)} hours ago
+                </Typography>
               </Grid>
-            )}
+              <Grid item>
+                <Typography variant="h2">{post.title}</Typography>
+              </Grid>
+              <Grid item style={{ maxHeight: 32, overflowY: "hidden" }}>
+                <Typography variant="body1">{post.contents}</Typography>
+              </Grid>
+              {!post.image && (
+                <Grid item>
+                  <Image
+                    src={"https://source.unsplash.com/random/980x540"}
+                    alt={post.title + " image"}
+                    width={980}
+                    height={540}
+                    layout="intrinsic"
+                  />
+                </Grid>
+              )}
+            </Grid>
           </Grid>
-        </Grid>
+        </ButtonBase>
       </Grid>
     </Paper>
   );
