@@ -10,19 +10,13 @@ import {
 } from "@material-ui/core";
 import { ArrowDownward, ArrowUpward } from "@material-ui/icons";
 import { Post } from "../API";
+import { formatDatePosted } from "../lib/formatDatePosted";
 
 interface Props {
   post: Post;
 }
 
 const PostPreview: FC<Props> = ({ post }) => {
-  function formatDatePosted(date: string): string {
-    const now = new Date(Date.now());
-    const current = new Date(date);
-    const diff = now.getTime() - current.getTime();
-    return (diff / 1000 / 60 / 60).toFixed(0);
-  }
-
   const router = useRouter();
 
   return (

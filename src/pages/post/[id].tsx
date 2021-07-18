@@ -3,13 +3,24 @@ import { GetStaticProps, GetStaticPropsContext, GetStaticPaths } from "next";
 import { withSSRContext } from "aws-amplify";
 import { getPost, listPosts } from "../../graphql/queries";
 import { GetPostQuery, ListPostsQuery, Post } from "../../API";
+import { Container } from "@material-ui/core";
+import PostPreview from "../../components/PostPreview";
+import PostComment from "../../components/PostComment";
 
 interface Props {
   post: Post;
 }
 
 const IndividualPost: FC<Props> = ({ post }) => {
-  return <div>{post.title}</div>;
+  return (
+    <div>
+      <PostPreview post={post} />
+
+      {post.comments.items.map((comment) => {
+        <PostComment key={comment.id} comment={comment} />;
+      })}
+    </div>
+  );
 };
 
 export const getStaticProps: GetStaticProps = async (
