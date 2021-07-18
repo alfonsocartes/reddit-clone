@@ -8,6 +8,7 @@ import Head from "next/head";
 import React, { useEffect } from "react";
 
 import awsconfig from "../aws-exports";
+import Header from "../components/Header";
 // Context
 import AuthContext from "../context/AuthContext";
 import theme from "../theme";
@@ -38,6 +39,7 @@ function MyApp({ Component, pageProps }) {
         <ThemeProvider theme={theme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
+          <Header />
           <Component {...pageProps} />
         </ThemeProvider>
       </AuthContext>

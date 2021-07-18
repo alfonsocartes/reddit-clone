@@ -1,12 +1,12 @@
 import { CognitoUser } from "@aws-amplify/auth";
 // Styles
-import { Button, Grid, Snackbar,TextField } from "@material-ui/core";
+import { Button, Grid, Snackbar, TextField } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 // AWS Amplify
 import { Auth } from "aws-amplify";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { SubmitHandler,useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 // Context
 import { useUser } from "../context/AuthContext";
@@ -18,7 +18,6 @@ interface IFormInput {
 
 const Login = () => {
   const router = useRouter();
-  const { user, setUser } = useUser();
   const [open, setOpen] = useState(false);
   const [logInError, setLogInError] = useState<string>("");
 
@@ -30,12 +29,12 @@ const Login = () => {
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     const { username, password } = data;
-    const amplifyUser = await Auth.signIn(username, password);
-    console.log("Success, signed in a user", amplifyUser);
-    if (amplifyUser) {
+    try {
+      await Auth.signIn(username, password);
       router.push("/");
-    } else {
-      throw new Error("Error, something whent wrong");
+    } catch (error) {
+      setLogInError(error.message);
+      setOpen(true);
     }
   };
 
@@ -47,62 +46,53 @@ const Login = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-      <Grid container direction="column" alignItems="center" justify="center">
+    <>
+      <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
         <Grid container direction="column" alignItems="center" justify="center">
-          <Grid item>
-            <TextField
-              variant="outlined"
-              id="username"
-              label="Username"
-              type="text"
-              error={errors.username ? true : false}
-              helperText={errors.username ? errors.username.message : null}
-              {...register("username", {
-                required: { value: true, message: "Please enter a username." },
-                minLength: {
-                  value: 3,
-                  message: "Please enter a username between 3-16 characters.",
-                },
-                maxLength: {
-                  value: 16,
-                  message: "Please enter a username between 3-16 characters.",
-                },
-              })}
-            />
+          <Grid
+            container
+            direction="column"
+            alignItems="center"
+            justify="center"
+          >
+            <Grid item>
+              <TextField
+                variant="outlined"
+                id="username"
+                label="Username"
+                type="text"
+                error={errors.username ? true : false}
+                helperText={errors.username ? errors.username.message : null}
+                {...register("username")}
+              />
+            </Grid>
+
+            <Grid item>
+              <TextField
+                variant="outlined"
+                id="password"
+                label="Password"
+                type="password"
+                error={errors.password ? true : false}
+                helperText={errors.password ? errors.password.message : null}
+                {...register("password")}
+              />
+            </Grid>
           </Grid>
 
-          <Grid item>
-            <TextField
-              variant="outlined"
-              id="password"
-              label="Password"
-              type="password"
-              error={errors.password ? true : false}
-              helperText={errors.password ? errors.password.message : null}
-              {...register("password", {
-                required: { value: true, message: "Please enter a password." },
-                minLength: {
-                  value: 8,
-                  message: "Please enter a stronger password.",
-                },
-              })}
-            />
+          <Grid style={{ marginTop: 16 }}>
+            <Button variant="contained" type="submit">
+              Log in
+            </Button>
           </Grid>
         </Grid>
-
-        <Grid style={{ marginTop: 16 }}>
-          <Button variant="contained" type="submit">
-            Log in
-          </Button>
-        </Grid>
-      </Grid>
+      </form>
       <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="error">
           {logInError}
         </Alert>
       </Snackbar>
-    </form>
+    </>
   );
 };
 

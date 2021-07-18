@@ -1,6 +1,6 @@
 import { Container } from "@material-ui/core";
 import { withSSRContext } from "aws-amplify";
-import { GetStaticPaths,GetStaticProps, GetStaticPropsContext } from "next";
+import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import React, { FC } from "react";
 
 import { GetPostQuery, ListPostsQuery, Post } from "../../API";
@@ -14,13 +14,13 @@ interface Props {
 
 const IndividualPost: FC<Props> = ({ post }) => {
   return (
-    <div>
+    <Container maxWidth="md">
       <PostPreview post={post} />
 
       {post.comments.items.map((comment) => {
         <PostComment key={comment.id} comment={comment} />;
       })}
-    </div>
+    </Container>
   );
 };
 
