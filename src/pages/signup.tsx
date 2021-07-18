@@ -1,14 +1,12 @@
-import React, { useState } from "react";
-import { useRouter } from "next/router";
-import { useForm, SubmitHandler } from "react-hook-form";
-
+import { CognitoUser } from "@aws-amplify/auth";
+// Styles
+import { Button, Grid, Snackbar,TextField } from "@material-ui/core";
+import { Alert } from "@material-ui/lab";
 // AWS Amplify
 import { Auth } from "aws-amplify";
-import { CognitoUser } from "@aws-amplify/auth";
-
-// Styles
-import { Button, Grid, TextField, Snackbar } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+import { SubmitHandler,useForm } from "react-hook-form";
 
 // Context
 import { useUser } from "../context/AuthContext";

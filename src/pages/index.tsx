@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
 import { Container, Typography } from "@material-ui/core";
 import { API } from "aws-amplify";
+import React, { useEffect, useState } from "react";
 
-import { listPosts } from "../graphql/queries";
-import { useUser } from "../context/AuthContext";
 import { ListPostsQuery, Post } from "../API";
 import PostPreview from "../components/PostPreview";
+import { useUser } from "../context/AuthContext";
+import { listPosts } from "../graphql/queries";
 
 const Home: React.FC = () => {
   const { user } = useUser();

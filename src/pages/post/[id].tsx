@@ -1,11 +1,12 @@
-import React, { FC } from "react";
-import { GetStaticProps, GetStaticPropsContext, GetStaticPaths } from "next";
-import { withSSRContext } from "aws-amplify";
-import { getPost, listPosts } from "../../graphql/queries";
-import { GetPostQuery, ListPostsQuery, Post } from "../../API";
 import { Container } from "@material-ui/core";
-import PostPreview from "../../components/PostPreview";
+import { withSSRContext } from "aws-amplify";
+import { GetStaticPaths,GetStaticProps, GetStaticPropsContext } from "next";
+import React, { FC } from "react";
+
+import { GetPostQuery, ListPostsQuery, Post } from "../../API";
 import PostComment from "../../components/PostComment";
+import PostPreview from "../../components/PostPreview";
+import { getPost, listPosts } from "../../graphql/queries";
 
 interface Props {
   post: Post;

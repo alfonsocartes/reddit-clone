@@ -1,18 +1,16 @@
-import React, { useEffect } from "react";
-import Head from "next/head";
-
 // Style
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/core/styles";
-import theme from "../theme";
-
-// Context
-import AuthContext from "../context/AuthContext";
-
 // Amplify: because it's being imported in _app.js it will import it in every page
 // which might not be the best soluction becase it will increase the size by a lot
 import Amplify from "aws-amplify";
+import Head from "next/head";
+import React, { useEffect } from "react";
+
 import awsconfig from "../aws-exports";
+// Context
+import AuthContext from "../context/AuthContext";
+import theme from "../theme";
 
 Amplify.configure({ ...awsconfig, ssr: true });
 
