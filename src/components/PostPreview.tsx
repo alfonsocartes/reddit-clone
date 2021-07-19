@@ -6,9 +6,10 @@ import {
   Typography,
 } from "@material-ui/core";
 import { ArrowDownward, ArrowUpward } from "@material-ui/icons";
+import { Storage } from "aws-amplify";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 
 import { Post } from "../API";
 import { formatDatePosted } from "../lib/formatDatePosted";
@@ -19,6 +20,22 @@ interface Props {
 
 const PostPreview: FC<Props> = ({ post }) => {
   const router = useRouter();
+  const [postImage, setPostImage] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    async function getImageFromStorage() {
+      try {
+        const signedURL = await Storage.get(post.image); // get key from Storage.list
+        console.log("Found Image:", signedURL);
+        // @ts-ignore
+        setPostImage(signedURL);
+      } catch (error) {
+        console.log("No image found.");
+      }
+    }
+
+    getImageFromStorage();
+  }, []);
 
   return (
     <Paper elevation={3}>
@@ -76,13 +93,13 @@ const PostPreview: FC<Props> = ({ post }) => {
               <Grid item style={{ maxHeight: 32, overflowY: "hidden" }}>
                 <Typography variant="body1">{post.contents}</Typography>
               </Grid>
-              {!post.image && (
+              {post.image && postImage && (
                 <Grid item>
                   <Image
-                    src={"https://source.unsplash.com/random/980x540"}
-                    alt={post.title + " image"}
-                    width={980}
+                    src={postImage}
+                    alt={`${post.title} image`}
                     height={540}
+                    width={980}
                     layout="intrinsic"
                   />
                 </Grid>
