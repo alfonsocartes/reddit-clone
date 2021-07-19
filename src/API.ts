@@ -7,16 +7,12 @@ export type CreatePostInput = {
   title: string,
   contents: string,
   image?: string | null,
-  upvotes: number,
-  downvotes: number,
 };
 
 export type ModelPostConditionInput = {
   title?: ModelStringInput | null,
   contents?: ModelStringInput | null,
   image?: ModelStringInput | null,
-  upvotes?: ModelIntInput | null,
-  downvotes?: ModelIntInput | null,
   and?: Array< ModelPostConditionInput | null > | null,
   or?: Array< ModelPostConditionInput | null > | null,
   not?: ModelPostConditionInput | null,
@@ -62,30 +58,17 @@ export type ModelSizeInput = {
   between?: Array< number | null > | null,
 };
 
-export type ModelIntInput = {
-  ne?: number | null,
-  eq?: number | null,
-  le?: number | null,
-  lt?: number | null,
-  ge?: number | null,
-  gt?: number | null,
-  between?: Array< number | null > | null,
-  attributeExists?: boolean | null,
-  attributeType?: ModelAttributeTypes | null,
-};
-
 export type Post = {
   __typename: "Post",
   id: string,
   title: string,
   contents: string,
   image?: string | null,
-  upvotes: number,
-  downvotes: number,
   createdAt: string,
   updatedAt: string,
   owner?: string | null,
   comments?: ModelCommentConnection | null,
+  votes?: ModelVoteConnection | null,
 };
 
 export type ModelCommentConnection = {
@@ -105,13 +88,28 @@ export type Comment = {
   owner?: string | null,
 };
 
+export type ModelVoteConnection = {
+  __typename: "ModelVoteConnection",
+  items?:  Array<Vote | null > | null,
+  nextToken?: string | null,
+};
+
+export type Vote = {
+  __typename: "Vote",
+  id: string,
+  vote: string,
+  postID: string,
+  createdAt: string,
+  updatedAt: string,
+  post?: Post | null,
+  owner?: string | null,
+};
+
 export type UpdatePostInput = {
   id: string,
   title?: string | null,
   contents?: string | null,
   image?: string | null,
-  upvotes?: number | null,
-  downvotes?: number | null,
 };
 
 export type DeletePostInput = {
@@ -158,13 +156,35 @@ export type DeleteCommentInput = {
   id: string,
 };
 
+export type CreateVoteInput = {
+  id?: string | null,
+  vote: string,
+  postID: string,
+};
+
+export type ModelVoteConditionInput = {
+  vote?: ModelStringInput | null,
+  postID?: ModelIDInput | null,
+  and?: Array< ModelVoteConditionInput | null > | null,
+  or?: Array< ModelVoteConditionInput | null > | null,
+  not?: ModelVoteConditionInput | null,
+};
+
+export type UpdateVoteInput = {
+  id: string,
+  vote?: string | null,
+  postID?: string | null,
+};
+
+export type DeleteVoteInput = {
+  id: string,
+};
+
 export type ModelPostFilterInput = {
   id?: ModelIDInput | null,
   title?: ModelStringInput | null,
   contents?: ModelStringInput | null,
   image?: ModelStringInput | null,
-  upvotes?: ModelIntInput | null,
-  downvotes?: ModelIntInput | null,
   and?: Array< ModelPostFilterInput | null > | null,
   or?: Array< ModelPostFilterInput | null > | null,
   not?: ModelPostFilterInput | null,
@@ -185,6 +205,15 @@ export type ModelCommentFilterInput = {
   not?: ModelCommentFilterInput | null,
 };
 
+export type ModelVoteFilterInput = {
+  id?: ModelIDInput | null,
+  vote?: ModelStringInput | null,
+  postID?: ModelIDInput | null,
+  and?: Array< ModelVoteFilterInput | null > | null,
+  or?: Array< ModelVoteFilterInput | null > | null,
+  not?: ModelVoteFilterInput | null,
+};
+
 export type CreatePostMutationVariables = {
   input: CreatePostInput,
   condition?: ModelPostConditionInput | null,
@@ -197,8 +226,6 @@ export type CreatePostMutation = {
     title: string,
     contents: string,
     image?: string | null,
-    upvotes: number,
-    downvotes: number,
     createdAt: string,
     updatedAt: string,
     owner?: string | null,
@@ -209,6 +236,19 @@ export type CreatePostMutation = {
         id: string,
         postID: string,
         content: string,
+        createdAt: string,
+        updatedAt: string,
+        owner?: string | null,
+      } | null > | null,
+      nextToken?: string | null,
+    } | null,
+    votes?:  {
+      __typename: "ModelVoteConnection",
+      items?:  Array< {
+        __typename: "Vote",
+        id: string,
+        vote: string,
+        postID: string,
         createdAt: string,
         updatedAt: string,
         owner?: string | null,
@@ -230,8 +270,6 @@ export type UpdatePostMutation = {
     title: string,
     contents: string,
     image?: string | null,
-    upvotes: number,
-    downvotes: number,
     createdAt: string,
     updatedAt: string,
     owner?: string | null,
@@ -242,6 +280,19 @@ export type UpdatePostMutation = {
         id: string,
         postID: string,
         content: string,
+        createdAt: string,
+        updatedAt: string,
+        owner?: string | null,
+      } | null > | null,
+      nextToken?: string | null,
+    } | null,
+    votes?:  {
+      __typename: "ModelVoteConnection",
+      items?:  Array< {
+        __typename: "Vote",
+        id: string,
+        vote: string,
+        postID: string,
         createdAt: string,
         updatedAt: string,
         owner?: string | null,
@@ -263,8 +314,6 @@ export type DeletePostMutation = {
     title: string,
     contents: string,
     image?: string | null,
-    upvotes: number,
-    downvotes: number,
     createdAt: string,
     updatedAt: string,
     owner?: string | null,
@@ -275,6 +324,19 @@ export type DeletePostMutation = {
         id: string,
         postID: string,
         content: string,
+        createdAt: string,
+        updatedAt: string,
+        owner?: string | null,
+      } | null > | null,
+      nextToken?: string | null,
+    } | null,
+    votes?:  {
+      __typename: "ModelVoteConnection",
+      items?:  Array< {
+        __typename: "Vote",
+        id: string,
+        vote: string,
+        postID: string,
         createdAt: string,
         updatedAt: string,
         owner?: string | null,
@@ -303,13 +365,15 @@ export type CreateCommentMutation = {
       title: string,
       contents: string,
       image?: string | null,
-      upvotes: number,
-      downvotes: number,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
       comments?:  {
         __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
         nextToken?: string | null,
       } | null,
     } | null,
@@ -336,13 +400,15 @@ export type UpdateCommentMutation = {
       title: string,
       contents: string,
       image?: string | null,
-      upvotes: number,
-      downvotes: number,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
       comments?:  {
         __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
         nextToken?: string | null,
       } | null,
     } | null,
@@ -369,13 +435,120 @@ export type DeleteCommentMutation = {
       title: string,
       contents: string,
       image?: string | null,
-      upvotes: number,
-      downvotes: number,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
       comments?:  {
         __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
+        nextToken?: string | null,
+      } | null,
+    } | null,
+    owner?: string | null,
+  } | null,
+};
+
+export type CreateVoteMutationVariables = {
+  input: CreateVoteInput,
+  condition?: ModelVoteConditionInput | null,
+};
+
+export type CreateVoteMutation = {
+  createVote?:  {
+    __typename: "Vote",
+    id: string,
+    vote: string,
+    postID: string,
+    createdAt: string,
+    updatedAt: string,
+    post?:  {
+      __typename: "Post",
+      id: string,
+      title: string,
+      contents: string,
+      image?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+      comments?:  {
+        __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
+        nextToken?: string | null,
+      } | null,
+    } | null,
+    owner?: string | null,
+  } | null,
+};
+
+export type UpdateVoteMutationVariables = {
+  input: UpdateVoteInput,
+  condition?: ModelVoteConditionInput | null,
+};
+
+export type UpdateVoteMutation = {
+  updateVote?:  {
+    __typename: "Vote",
+    id: string,
+    vote: string,
+    postID: string,
+    createdAt: string,
+    updatedAt: string,
+    post?:  {
+      __typename: "Post",
+      id: string,
+      title: string,
+      contents: string,
+      image?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+      comments?:  {
+        __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
+        nextToken?: string | null,
+      } | null,
+    } | null,
+    owner?: string | null,
+  } | null,
+};
+
+export type DeleteVoteMutationVariables = {
+  input: DeleteVoteInput,
+  condition?: ModelVoteConditionInput | null,
+};
+
+export type DeleteVoteMutation = {
+  deleteVote?:  {
+    __typename: "Vote",
+    id: string,
+    vote: string,
+    postID: string,
+    createdAt: string,
+    updatedAt: string,
+    post?:  {
+      __typename: "Post",
+      id: string,
+      title: string,
+      contents: string,
+      image?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+      comments?:  {
+        __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
         nextToken?: string | null,
       } | null,
     } | null,
@@ -394,8 +567,6 @@ export type GetPostQuery = {
     title: string,
     contents: string,
     image?: string | null,
-    upvotes: number,
-    downvotes: number,
     createdAt: string,
     updatedAt: string,
     owner?: string | null,
@@ -406,6 +577,19 @@ export type GetPostQuery = {
         id: string,
         postID: string,
         content: string,
+        createdAt: string,
+        updatedAt: string,
+        owner?: string | null,
+      } | null > | null,
+      nextToken?: string | null,
+    } | null,
+    votes?:  {
+      __typename: "ModelVoteConnection",
+      items?:  Array< {
+        __typename: "Vote",
+        id: string,
+        vote: string,
+        postID: string,
         createdAt: string,
         updatedAt: string,
         owner?: string | null,
@@ -430,13 +614,15 @@ export type ListPostsQuery = {
       title: string,
       contents: string,
       image?: string | null,
-      upvotes: number,
-      downvotes: number,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
       comments?:  {
         __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
         nextToken?: string | null,
       } | null,
     } | null > | null,
@@ -462,13 +648,15 @@ export type GetCommentQuery = {
       title: string,
       contents: string,
       image?: string | null,
-      upvotes: number,
-      downvotes: number,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
       comments?:  {
         __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
         nextToken?: string | null,
       } | null,
     } | null,
@@ -498,8 +686,72 @@ export type ListCommentsQuery = {
         title: string,
         contents: string,
         image?: string | null,
-        upvotes: number,
-        downvotes: number,
+        createdAt: string,
+        updatedAt: string,
+        owner?: string | null,
+      } | null,
+      owner?: string | null,
+    } | null > | null,
+    nextToken?: string | null,
+  } | null,
+};
+
+export type GetVoteQueryVariables = {
+  id: string,
+};
+
+export type GetVoteQuery = {
+  getVote?:  {
+    __typename: "Vote",
+    id: string,
+    vote: string,
+    postID: string,
+    createdAt: string,
+    updatedAt: string,
+    post?:  {
+      __typename: "Post",
+      id: string,
+      title: string,
+      contents: string,
+      image?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+      comments?:  {
+        __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
+        nextToken?: string | null,
+      } | null,
+    } | null,
+    owner?: string | null,
+  } | null,
+};
+
+export type ListVotesQueryVariables = {
+  filter?: ModelVoteFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type ListVotesQuery = {
+  listVotes?:  {
+    __typename: "ModelVoteConnection",
+    items?:  Array< {
+      __typename: "Vote",
+      id: string,
+      vote: string,
+      postID: string,
+      createdAt: string,
+      updatedAt: string,
+      post?:  {
+        __typename: "Post",
+        id: string,
+        title: string,
+        contents: string,
+        image?: string | null,
         createdAt: string,
         updatedAt: string,
         owner?: string | null,
@@ -517,8 +769,6 @@ export type OnCreatePostSubscription = {
     title: string,
     contents: string,
     image?: string | null,
-    upvotes: number,
-    downvotes: number,
     createdAt: string,
     updatedAt: string,
     owner?: string | null,
@@ -529,6 +779,19 @@ export type OnCreatePostSubscription = {
         id: string,
         postID: string,
         content: string,
+        createdAt: string,
+        updatedAt: string,
+        owner?: string | null,
+      } | null > | null,
+      nextToken?: string | null,
+    } | null,
+    votes?:  {
+      __typename: "ModelVoteConnection",
+      items?:  Array< {
+        __typename: "Vote",
+        id: string,
+        vote: string,
+        postID: string,
         createdAt: string,
         updatedAt: string,
         owner?: string | null,
@@ -545,8 +808,6 @@ export type OnUpdatePostSubscription = {
     title: string,
     contents: string,
     image?: string | null,
-    upvotes: number,
-    downvotes: number,
     createdAt: string,
     updatedAt: string,
     owner?: string | null,
@@ -563,6 +824,19 @@ export type OnUpdatePostSubscription = {
       } | null > | null,
       nextToken?: string | null,
     } | null,
+    votes?:  {
+      __typename: "ModelVoteConnection",
+      items?:  Array< {
+        __typename: "Vote",
+        id: string,
+        vote: string,
+        postID: string,
+        createdAt: string,
+        updatedAt: string,
+        owner?: string | null,
+      } | null > | null,
+      nextToken?: string | null,
+    } | null,
   } | null,
 };
 
@@ -573,8 +847,6 @@ export type OnDeletePostSubscription = {
     title: string,
     contents: string,
     image?: string | null,
-    upvotes: number,
-    downvotes: number,
     createdAt: string,
     updatedAt: string,
     owner?: string | null,
@@ -585,6 +857,19 @@ export type OnDeletePostSubscription = {
         id: string,
         postID: string,
         content: string,
+        createdAt: string,
+        updatedAt: string,
+        owner?: string | null,
+      } | null > | null,
+      nextToken?: string | null,
+    } | null,
+    votes?:  {
+      __typename: "ModelVoteConnection",
+      items?:  Array< {
+        __typename: "Vote",
+        id: string,
+        vote: string,
+        postID: string,
         createdAt: string,
         updatedAt: string,
         owner?: string | null,
@@ -608,13 +893,15 @@ export type OnCreateCommentSubscription = {
       title: string,
       contents: string,
       image?: string | null,
-      upvotes: number,
-      downvotes: number,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
       comments?:  {
         __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
         nextToken?: string | null,
       } | null,
     } | null,
@@ -636,13 +923,15 @@ export type OnUpdateCommentSubscription = {
       title: string,
       contents: string,
       image?: string | null,
-      upvotes: number,
-      downvotes: number,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
       comments?:  {
         __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
         nextToken?: string | null,
       } | null,
     } | null,
@@ -664,13 +953,105 @@ export type OnDeleteCommentSubscription = {
       title: string,
       contents: string,
       image?: string | null,
-      upvotes: number,
-      downvotes: number,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
       comments?:  {
         __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
+        nextToken?: string | null,
+      } | null,
+    } | null,
+    owner?: string | null,
+  } | null,
+};
+
+export type OnCreateVoteSubscription = {
+  onCreateVote?:  {
+    __typename: "Vote",
+    id: string,
+    vote: string,
+    postID: string,
+    createdAt: string,
+    updatedAt: string,
+    post?:  {
+      __typename: "Post",
+      id: string,
+      title: string,
+      contents: string,
+      image?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+      comments?:  {
+        __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
+        nextToken?: string | null,
+      } | null,
+    } | null,
+    owner?: string | null,
+  } | null,
+};
+
+export type OnUpdateVoteSubscription = {
+  onUpdateVote?:  {
+    __typename: "Vote",
+    id: string,
+    vote: string,
+    postID: string,
+    createdAt: string,
+    updatedAt: string,
+    post?:  {
+      __typename: "Post",
+      id: string,
+      title: string,
+      contents: string,
+      image?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+      comments?:  {
+        __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
+        nextToken?: string | null,
+      } | null,
+    } | null,
+    owner?: string | null,
+  } | null,
+};
+
+export type OnDeleteVoteSubscription = {
+  onDeleteVote?:  {
+    __typename: "Vote",
+    id: string,
+    vote: string,
+    postID: string,
+    createdAt: string,
+    updatedAt: string,
+    post?:  {
+      __typename: "Post",
+      id: string,
+      title: string,
+      contents: string,
+      image?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+      comments?:  {
+        __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+      } | null,
+      votes?:  {
+        __typename: "ModelVoteConnection",
         nextToken?: string | null,
       } | null,
     } | null,

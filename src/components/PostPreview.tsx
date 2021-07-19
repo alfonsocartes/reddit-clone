@@ -1,3 +1,4 @@
+import { GRAPHQL_AUTH_MODE } from "@aws-amplify/api";
 import {
   ButtonBase,
   Grid,
@@ -5,22 +6,63 @@ import {
   Paper,
   Typography,
 } from "@material-ui/core";
-import { ArrowDownward, ArrowUpward } from "@material-ui/icons";
-import { Storage } from "aws-amplify";
+import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
+import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
+import { API, Auth, Storage } from "aws-amplify";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { FC, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 
-import { Post } from "../API";
-import { formatDatePosted } from "../lib/formatDatePosted";
+import {
+  CreateVoteInput,
+  CreateVoteMutation,
+  Post,
+  UpdateVoteInput,
+  UpdateVoteMutation,
+  UpdateVoteMutationVariables,
+} from "../API";
+import { useUser } from "../context/AuthContext";
+import { createVote, updateVote } from "../graphql/mutations";
+import formatDatePosted from "../lib/formatDatePosted";
 
 interface Props {
   post: Post;
 }
 
-const PostPreview: FC<Props> = ({ post }) => {
+export default function PostPreview({ post }: Props): ReactElement {
   const router = useRouter();
+  const { user } = useUser();
   const [postImage, setPostImage] = useState<string | undefined>(undefined);
+  const [existingVote, setExistingVote] = useState<string | undefined>(
+    undefined
+  );
+  const [existingVoteId, setExistingVoteId] = useState<string | undefined>(
+    undefined
+  );
+  const [upvotes, setUpvotes] = useState<number>(
+    post.votes.items
+      ? post.votes.items.filter((v) => v.vote === "upvote").length
+      : 0
+  );
+
+  const [downvotes, setDownvotes] = useState<number>(
+    post.votes.items
+      ? post.votes.items.filter((v) => v.vote === "downvote").length
+      : 0
+  );
+
+  useEffect(() => {
+    if (user) {
+      const tryFindVote = post.votes.items?.find(
+        (v) => v.owner === user.getUsername()
+      );
+
+      if (tryFindVote) {
+        setExistingVote(tryFindVote.vote);
+        setExistingVoteId(tryFindVote.id);
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     async function getImageFromStorage() {
@@ -37,6 +79,64 @@ const PostPreview: FC<Props> = ({ post }) => {
     getImageFromStorage();
   }, []);
 
+  const addVote = async (voteType: string) => {
+    if (existingVote && existingVote != voteType) {
+      const updateVoteInput: UpdateVoteInput = {
+        id: existingVoteId,
+        vote: voteType,
+        postID: post.id,
+      };
+
+      const updateThisVote = (await API.graphql({
+        query: updateVote,
+        variables: { input: updateVoteInput },
+        authMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS,
+      })) as { data: UpdateVoteMutation };
+      // if they're changing their vote...
+      // updateVote rather than create vote.
+
+      if (voteType === "upvote") {
+        setUpvotes(upvotes + 1);
+        setDownvotes(downvotes - 1);
+      }
+
+      if (voteType === "downvote") {
+        setUpvotes(upvotes - 1);
+        setDownvotes(downvotes + 1);
+      }
+      setExistingVote(voteType);
+      setExistingVoteId(updateThisVote.data.updateVote.id);
+      console.log("Updated vote:", updateThisVote);
+    }
+
+    if (!existingVote) {
+      const createNewVoteInput: CreateVoteInput = {
+        vote: voteType,
+        postID: post.id,
+      };
+
+      const createNewVote = (await API.graphql({
+        query: createVote,
+        variables: { input: createNewVoteInput },
+        authMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS,
+      })) as { data: CreateVoteMutation };
+
+      if (createNewVote.data.createVote.vote === "downvote") {
+        setDownvotes(downvotes + 1);
+      }
+      if (createNewVote.data.createVote.vote === "upvote") {
+        setUpvotes(upvotes + 1);
+      }
+      setExistingVote(voteType);
+      setExistingVoteId(createNewVote.data.createVote.id);
+      console.log("Created vote:", createNewVote);
+    }
+  };
+
+  console.log(post);
+  console.log("Upvotes:", upvotes);
+  console.log("Downvotes:", downvotes);
+
   return (
     <Paper elevation={3}>
       <Grid
@@ -46,24 +146,20 @@ const PostPreview: FC<Props> = ({ post }) => {
         alignItems="flex-start"
         wrap="nowrap"
         spacing={3}
-        style={{
-          padding: 12,
-          marginTop: 24,
-        }}
+        style={{ padding: 12, marginTop: 24 }}
       >
+        {/* Upvote / votes / downvote */}
         <Grid item style={{ maxWidth: 128 }}>
           <Grid container direction="column" alignItems="center">
             <Grid item>
-              <IconButton color="inherit">
-                <ArrowUpward />
+              <IconButton color="inherit" onClick={() => addVote("upvote")}>
+                <ArrowUpwardIcon />
               </IconButton>
             </Grid>
             <Grid item>
-              <Grid container direction="column" alignItems="center">
+              <Grid container alignItems="center" direction="column">
                 <Grid item>
-                  <Typography variant="h6">
-                    {(post.upvotes - post.downvotes).toString()}
-                  </Typography>
+                  <Typography variant="h6">{upvotes - downvotes}</Typography>
                 </Grid>
                 <Grid item>
                   <Typography variant="body2">votes</Typography>
@@ -71,15 +167,16 @@ const PostPreview: FC<Props> = ({ post }) => {
               </Grid>
             </Grid>
             <Grid item>
-              <IconButton color="inherit">
-                <ArrowDownward />
+              <IconButton color="inherit" onClick={() => addVote("downvote")}>
+                <ArrowDownwardIcon />
               </IconButton>
             </Grid>
           </Grid>
         </Grid>
 
-        <ButtonBase onClick={() => router.push(`/post/${post.id}`)}>
-          <Grid item>
+        {/* Content Preview */}
+        <Grid item>
+          <ButtonBase onClick={() => router.push(`/post/${post.id}`)}>
             <Grid container direction="column" alignItems="flex-start">
               <Grid item>
                 <Typography variant="body1">
@@ -90,7 +187,14 @@ const PostPreview: FC<Props> = ({ post }) => {
               <Grid item>
                 <Typography variant="h2">{post.title}</Typography>
               </Grid>
-              <Grid item style={{ maxHeight: 32, overflowY: "hidden" }}>
+              <Grid
+                item
+                style={{
+                  maxHeight: 32,
+                  overflowY: "hidden",
+                  overflowX: "hidden",
+                }}
+              >
                 <Typography variant="body1">{post.contents}</Typography>
               </Grid>
               {post.image && postImage && (
@@ -105,11 +209,9 @@ const PostPreview: FC<Props> = ({ post }) => {
                 </Grid>
               )}
             </Grid>
-          </Grid>
-        </ButtonBase>
+          </ButtonBase>
+        </Grid>
       </Grid>
     </Paper>
   );
-};
-
-export default PostPreview;
+}

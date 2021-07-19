@@ -1,4 +1,4 @@
-export function formatDatePosted(date: string): string {
+export default function formatDatePosted(date: string): string {
   const now = new Date(Date.now());
   const current = new Date(date);
   const diff = now.getTime() - current.getTime();

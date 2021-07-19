@@ -12,8 +12,6 @@ export const createPost = /* GraphQL */ `
       title
       contents
       image
-      upvotes
-      downvotes
       createdAt
       updatedAt
       owner
@@ -22,6 +20,17 @@ export const createPost = /* GraphQL */ `
           id
           postID
           content
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+      votes {
+        items {
+          id
+          vote
+          postID
           createdAt
           updatedAt
           owner
@@ -41,8 +50,6 @@ export const updatePost = /* GraphQL */ `
       title
       contents
       image
-      upvotes
-      downvotes
       createdAt
       updatedAt
       owner
@@ -51,6 +58,17 @@ export const updatePost = /* GraphQL */ `
           id
           postID
           content
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+      votes {
+        items {
+          id
+          vote
+          postID
           createdAt
           updatedAt
           owner
@@ -70,8 +88,6 @@ export const deletePost = /* GraphQL */ `
       title
       contents
       image
-      upvotes
-      downvotes
       createdAt
       updatedAt
       owner
@@ -80,6 +96,17 @@ export const deletePost = /* GraphQL */ `
           id
           postID
           content
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+      votes {
+        items {
+          id
+          vote
+          postID
           createdAt
           updatedAt
           owner
@@ -105,12 +132,13 @@ export const createComment = /* GraphQL */ `
         title
         contents
         image
-        upvotes
-        downvotes
         createdAt
         updatedAt
         owner
         comments {
+          nextToken
+        }
+        votes {
           nextToken
         }
       }
@@ -134,12 +162,13 @@ export const updateComment = /* GraphQL */ `
         title
         contents
         image
-        upvotes
-        downvotes
         createdAt
         updatedAt
         owner
         comments {
+          nextToken
+        }
+        votes {
           nextToken
         }
       }
@@ -163,12 +192,103 @@ export const deleteComment = /* GraphQL */ `
         title
         contents
         image
-        upvotes
-        downvotes
         createdAt
         updatedAt
         owner
         comments {
+          nextToken
+        }
+        votes {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const createVote = /* GraphQL */ `
+  mutation CreateVote(
+    $input: CreateVoteInput!
+    $condition: ModelVoteConditionInput
+  ) {
+    createVote(input: $input, condition: $condition) {
+      id
+      vote
+      postID
+      createdAt
+      updatedAt
+      post {
+        id
+        title
+        contents
+        image
+        createdAt
+        updatedAt
+        owner
+        comments {
+          nextToken
+        }
+        votes {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const updateVote = /* GraphQL */ `
+  mutation UpdateVote(
+    $input: UpdateVoteInput!
+    $condition: ModelVoteConditionInput
+  ) {
+    updateVote(input: $input, condition: $condition) {
+      id
+      vote
+      postID
+      createdAt
+      updatedAt
+      post {
+        id
+        title
+        contents
+        image
+        createdAt
+        updatedAt
+        owner
+        comments {
+          nextToken
+        }
+        votes {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const deleteVote = /* GraphQL */ `
+  mutation DeleteVote(
+    $input: DeleteVoteInput!
+    $condition: ModelVoteConditionInput
+  ) {
+    deleteVote(input: $input, condition: $condition) {
+      id
+      vote
+      postID
+      createdAt
+      updatedAt
+      post {
+        id
+        title
+        contents
+        image
+        createdAt
+        updatedAt
+        owner
+        comments {
+          nextToken
+        }
+        votes {
           nextToken
         }
       }

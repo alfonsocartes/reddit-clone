@@ -92,8 +92,8 @@ const IndividualPost: FC<Props> = ({ post }) => {
       </form>
 
       {comments
-        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-        .map((comment) => (
+        ?.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        ?.map((comment) => (
           <PostComment key={comment.id} comment={comment} />
         ))}
     </Container>
