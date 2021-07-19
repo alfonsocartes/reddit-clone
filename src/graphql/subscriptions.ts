@@ -19,6 +19,15 @@ export const onCreatePost = /* GraphQL */ `
           content
           createdAt
           updatedAt
+          post {
+            id
+            title
+            contents
+            image
+            createdAt
+            updatedAt
+            owner
+          }
           owner
         }
         nextToken
@@ -30,6 +39,15 @@ export const onCreatePost = /* GraphQL */ `
           postID
           createdAt
           updatedAt
+          post {
+            id
+            title
+            contents
+            image
+            createdAt
+            updatedAt
+            owner
+          }
           owner
         }
         nextToken
@@ -54,6 +72,15 @@ export const onUpdatePost = /* GraphQL */ `
           content
           createdAt
           updatedAt
+          post {
+            id
+            title
+            contents
+            image
+            createdAt
+            updatedAt
+            owner
+          }
           owner
         }
         nextToken
@@ -65,6 +92,15 @@ export const onUpdatePost = /* GraphQL */ `
           postID
           createdAt
           updatedAt
+          post {
+            id
+            title
+            contents
+            image
+            createdAt
+            updatedAt
+            owner
+          }
           owner
         }
         nextToken
@@ -89,6 +125,15 @@ export const onDeletePost = /* GraphQL */ `
           content
           createdAt
           updatedAt
+          post {
+            id
+            title
+            contents
+            image
+            createdAt
+            updatedAt
+            owner
+          }
           owner
         }
         nextToken
@@ -100,6 +145,15 @@ export const onDeletePost = /* GraphQL */ `
           postID
           createdAt
           updatedAt
+          post {
+            id
+            title
+            contents
+            image
+            createdAt
+            updatedAt
+            owner
+          }
           owner
         }
         nextToken
@@ -124,9 +178,25 @@ export const onCreateComment = /* GraphQL */ `
         updatedAt
         owner
         comments {
+          items {
+            id
+            postID
+            content
+            createdAt
+            updatedAt
+            owner
+          }
           nextToken
         }
         votes {
+          items {
+            id
+            vote
+            postID
+            createdAt
+            updatedAt
+            owner
+          }
           nextToken
         }
       }
@@ -151,9 +221,25 @@ export const onUpdateComment = /* GraphQL */ `
         updatedAt
         owner
         comments {
+          items {
+            id
+            postID
+            content
+            createdAt
+            updatedAt
+            owner
+          }
           nextToken
         }
         votes {
+          items {
+            id
+            vote
+            postID
+            createdAt
+            updatedAt
+            owner
+          }
           nextToken
         }
       }
@@ -178,9 +264,25 @@ export const onDeleteComment = /* GraphQL */ `
         updatedAt
         owner
         comments {
+          items {
+            id
+            postID
+            content
+            createdAt
+            updatedAt
+            owner
+          }
           nextToken
         }
         votes {
+          items {
+            id
+            vote
+            postID
+            createdAt
+            updatedAt
+            owner
+          }
           nextToken
         }
       }
@@ -205,9 +307,25 @@ export const onCreateVote = /* GraphQL */ `
         updatedAt
         owner
         comments {
+          items {
+            id
+            postID
+            content
+            createdAt
+            updatedAt
+            owner
+          }
           nextToken
         }
         votes {
+          items {
+            id
+            vote
+            postID
+            createdAt
+            updatedAt
+            owner
+          }
           nextToken
         }
       }
@@ -232,9 +350,25 @@ export const onUpdateVote = /* GraphQL */ `
         updatedAt
         owner
         comments {
+          items {
+            id
+            postID
+            content
+            createdAt
+            updatedAt
+            owner
+          }
           nextToken
         }
         votes {
+          items {
+            id
+            vote
+            postID
+            createdAt
+            updatedAt
+            owner
+          }
           nextToken
         }
       }
@@ -259,9 +393,25 @@ export const onDeleteVote = /* GraphQL */ `
         updatedAt
         owner
         comments {
+          items {
+            id
+            postID
+            content
+            createdAt
+            updatedAt
+            owner
+          }
           nextToken
         }
         votes {
+          items {
+            id
+            vote
+            postID
+            createdAt
+            updatedAt
+            owner
+          }
           nextToken
         }
       }
